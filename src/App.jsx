@@ -35,35 +35,27 @@ import {
   Building,
   Mail,
   Phone,
-  MapPin,
-  Briefcase,
-  BookOpen,
-  Award,
-  CircleDot
+  MapPin
 } from 'lucide-react';
 
 const ComplaintManagementSystem = () => {
   const [currentUser, setCurrentUser] = useState({
     id: 1,
     name: 'Chinedu Okwu',
-    email: 'chinedu.okwu@uniport.edu.ng',
+    email: 'chinedu.okwu@student.uniport.edu.ng',
     role: 'student',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-    department: 'Computer Science',
+    department: 'Computer Engineering',
     level: '400 Level',
-    matricNo: 'U2020/5570125',
-    faculty: 'Faculty of Science',
-    address: 'University of Port Harcourt, Choba, Rivers State',
-    phone: '+2348012345678'
+    matricNo: 'CPE/2020/1245'
   });
   
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  // Existing state and data
   const [complaints, setComplaints] = useState([
     {
-      id: 'CSC/CMP/001',
+      id: 'CMP001',
       title: 'Broken Laboratory Equipment in Engineering Block',
       category: 'Academic',
       priority: 'High',
@@ -72,9 +64,9 @@ const ComplaintManagementSystem = () => {
       lastUpdated: '2024-09-03',
       description: 'Several oscilloscopes and multimeters in the Electronics Lab are not functioning properly, affecting practical sessions for final year students.',
       assignedTo: 'Laboratory Technician',
-      assignedBy: 'Dr. Emeka (HOD, Computer Science)',
+      assignedBy: 'Dr. Emeka (HOD)',
       student: 'Chinedu Okwu',
-      department: 'Computer Science',
+      department: 'Computer Engineering',
       estimatedResolution: '2024-09-10',
       updates: [
         { date: '2024-09-03', message: 'Equipment assessment completed, replacement parts ordered', by: 'Lab Technician' },
@@ -82,7 +74,7 @@ const ComplaintManagementSystem = () => {
       ]
     },
     {
-      id: 'CSC/CMP/002',
+      id: 'CMP002',
       title: 'Poor Network Connectivity in Student Hostels',
       category: 'ICT',
       priority: 'Critical',
@@ -93,14 +85,14 @@ const ComplaintManagementSystem = () => {
       assignedTo: 'ICT Directorate',
       assignedBy: 'Pending',
       student: 'Chinedu Okwu',
-      department: 'Computer Science',
+      department: 'Computer Engineering',
       estimatedResolution: 'TBD',
       updates: [
         { date: '2024-09-02', message: 'Complaint logged, awaiting technical assessment', by: 'System' }
       ]
     },
     {
-      id: 'CSC/CMP/003',
+      id: 'CMP003',
       title: 'Inadequate Power Supply in Library',
       category: 'Facilities',
       priority: 'Medium',
@@ -111,7 +103,7 @@ const ComplaintManagementSystem = () => {
       assignedTo: 'Maintenance Department',
       assignedBy: 'Library Director',
       student: 'Chinedu Okwu',
-      department: 'Computer Science',
+      department: 'Computer Engineering',
       estimatedResolution: '2024-09-01',
       resolution: 'Additional generator installed and UPS systems upgraded throughout the library.',
       updates: [
@@ -121,209 +113,104 @@ const ComplaintManagementSystem = () => {
       ]
     }
   ]);
-  
-  const [newComplaint, setNewComplaint] = useState({
-    title: '',
-    description: '',
-    category: '',
-    priority: 'Medium'
+
+  const [stats, setStats] = useState({
+    total: 67,
+    open: 18,
+    inProgress: 25,
+    resolved: 24,
+    avgResolutionTime: '7.8 days',
+    satisfactionRate: '88%'
   });
 
-  const stats = {
-    total: complaints.length,
-    open: complaints.filter(c => c.status === 'Open').length,
-    resolved: complaints.filter(c => c.status === 'Resolved').length,
-    inProgress: complaints.filter(c => c.status === 'In Progress').length,
-    avgResolutionTime: '4.5 days',
-    satisfactionRate: '92%'
-  };
+  const [showComplaintModal, setShowComplaintModal] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    category: '',
+    priority: '',
+    description: '',
+    department: '',
+    location: '',
+    evidence: null
+  });
 
-  const dashboardCards = [
-    { title: 'Total Complaints', value: stats.total, icon: FileText, color: 'bg-slate-500' },
-    { title: 'Open', value: stats.open, icon: CircleDot, color: 'bg-red-500' },
-    { title: 'In Progress', value: stats.inProgress, icon: Activity, color: 'bg-yellow-500' },
-    { title: 'Resolved', value: stats.resolved, icon: CheckCircle, color: 'bg-green-500' },
+  const categories = [
+    'Academic', 'Administrative', 'Facilities', 'ICT', 
+    'Welfare', 'Financial', 'Security', 'Transport', 'Hostel', 'Medical'
   ];
   
-  const ComplaintList = ({complaints, onSelectComplaint, showFilter = false}) => {
-    // This is a placeholder component for the complaint list
-    return (
-      <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg lg:text-xl font-bold text-gray-900">Your Recent Complaints</h3>
-          {showFilter && (
-            <button className="flex items-center space-x-2 px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-100 transition-all">
-              <Filter className="h-4 w-4" />
-              <span className="text-sm font-medium">Filter</span>
-            </button>
-          )}
-        </div>
-        <div className="space-y-4">
-          {complaints.map((complaint) => (
-            <div
-              key={complaint.id}
-              className="p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-              onClick={() => onSelectComplaint(complaint)}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-slate-700">{complaint.id}</span>
-                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  complaint.status === 'Resolved' ? 'bg-green-100 text-green-700' :
-                  complaint.status === 'In Progress' ? 'bg-yellow-100 text-yellow-700' :
-                  'bg-red-100 text-red-700'
-                }`}>
-                  {complaint.status}
-                </span>
-              </div>
-              <p className="text-lg font-bold text-gray-900 mb-1">{complaint.title}</p>
-              <p className="text-sm text-gray-500 line-clamp-2">{complaint.description}</p>
-              <div className="mt-2 text-xs text-gray-400">
-                <span>Submitted: {complaint.dateSubmitted}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const priorities = ['Low', 'Medium', 'High', 'Critical'];
+  const statuses = ['Open', 'In Progress', 'Under Review', 'Resolved', 'Closed'];
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'Open': 'bg-blue-600 text-white',
+      'In Progress': 'bg-amber-600 text-white',
+      'Under Review': 'bg-purple-600 text-white',
+      'Resolved': 'bg-green-600 text-white',
+      'Closed': 'bg-gray-600 text-white'
+    };
+    return colors[status] || 'bg-gray-600 text-white';
   };
-  
-  const StatCard = ({ title, value, icon: Icon, color, description, trend }) => (
-    <div className={`p-6 rounded-2xl text-white shadow-lg ${color}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="text-lg font-semibold">{title}</h4>
-        <Icon className="h-6 w-6 opacity-80" />
-      </div>
-      <p className="text-4xl font-extrabold">{value}</p>
-      <p className="text-sm opacity-90 mt-2">{description}</p>
-      {trend && <p className="text-xs opacity-70 mt-1">{trend}</p>}
-    </div>
-  );
-  
-  const ComplaintForm = () => {
-    // This is a placeholder component for the complaint form
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [category, setCategory] = useState('');
-    const [priority, setPriority] = useState('Medium');
-    
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      const newComplaintData = {
-        id: `CSC/CMP/${String(complaints.length + 1).padStart(3, '0')}`,
-        title,
-        description,
-        category,
-        priority,
-        status: 'Open',
-        dateSubmitted: new Date().toISOString().slice(0, 10),
-        lastUpdated: new Date().toISOString().slice(0, 10),
-        assignedTo: 'Pending',
-        assignedBy: 'Pending',
-        student: currentUser.name,
-        department: currentUser.department,
-        estimatedResolution: 'TBD',
-        updates: [
-          { date: new Date().toISOString().slice(0, 10), message: 'Complaint logged, awaiting assessment', by: 'System' }
-        ]
-      };
-      setComplaints([...complaints, newComplaintData]);
-      setActiveTab('complaints'); // Redirect to my complaints
+
+  const getPriorityColor = (priority) => {
+    const colors = {
+      'Low': 'bg-emerald-100 text-emerald-800',
+      'Medium': 'bg-yellow-100 text-yellow-800',
+      'High': 'bg-orange-100 text-orange-800',
+      'Critical': 'bg-red-100 text-red-800'
+    };
+    return colors[priority] || 'bg-gray-100 text-gray-800';
+  };
+
+  const handleSubmitComplaint = () => {
+    if (!formData.title || !formData.category || !formData.priority || !formData.description) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    const newComplaint = {
+      id: `CMP${String(complaints.length + 1).padStart(3, '0')}`,
+      title: formData.title,
+      category: formData.category,
+      priority: formData.priority,
+      status: 'Open',
+      dateSubmitted: new Date().toISOString().split('T')[0],
+      lastUpdated: new Date().toISOString().split('T')[0],
+      description: formData.description,
+      assignedTo: 'Pending Assignment',
+      assignedBy: 'Pending',
+      student: currentUser.name,
+      department: formData.department || currentUser.department,
+      estimatedResolution: 'TBD',
+      updates: [
+        { date: new Date().toISOString().split('T')[0], message: 'Complaint submitted successfully', by: 'System' }
+      ]
     };
     
-    return (
-      <div className="bg-white rounded-2xl p-6 lg:p-8 shadow-sm border border-gray-100">
-        <h3 className="text-xl lg:text-2xl font-bold text-gray-900 mb-6">Submit a New Complaint</h3>
-        <p className="text-gray-600 mb-8">
-          Fill out the form below to report an issue. Your complaint will be routed to the appropriate department.
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Complaint Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <textarea
-              id="description"
-              rows="4"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-slate-500 focus:border-slate-500"
-            ></textarea>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                Category
-              </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-                className="mt-1 block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-slate-500 focus:border-slate-500 sm:text-sm rounded-xl"
-              >
-                <option value="">Select a category</option>
-                <option value="Academic">Academic</option>
-                <option value="Facilities">Facilities</option>
-                <option value="ICT">ICT</option>
-                <option value="Admin">Admin</option>
-                <option value="Security">Security</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
-                Priority
-              </label>
-              <select
-                id="priority"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-                className="mt-1 block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-slate-500 focus:border-slate-500 sm:text-sm rounded-xl"
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-              </select>
-            </div>
-          </div>
-          <div className="pt-6">
-            <button
-              type="submit"
-              className="w-full px-6 py-3 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-slate-600 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all flex items-center justify-center space-x-2"
-            >
-              <Send className="h-5 w-5" />
-              <span>Submit Complaint</span>
-            </button>
-          </div>
-        </form>
-      </div>
-    );
+    setComplaints([newComplaint, ...complaints]);
+    setFormData({ title: '', category: '', priority: '', description: '', department: '', location: '', evidence: null });
+    setShowComplaintModal(false);
+    setStats(prev => ({ 
+      ...prev, 
+      total: prev.total + 1, 
+      open: prev.open + 1 
+    }));
   };
-  
+
   const Sidebar = () => (
     <div className={`fixed inset-y-0 left-0 z-50 w-64 lg:w-72 bg-slate-900 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 shadow-xl`}>
       <div className="flex items-center justify-between p-4 lg:p-6 border-b border-slate-700">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-lg flex items-center justify-center p-1">
-            <FileText className="h-5 w-5 lg:h-6 lg:w-6 text-slate-800" />
+          <div className="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-lg flex items-center justify-center">
+            {/* UNIPORT LOGO SPACE - Replace this div with <img src="uniport-logo.png" alt="UNIPORT" className="h-6 w-6 lg:h-8 lg:w-8" /> */}
+            <div className="text-slate-900 font-bold text-xs lg:text-sm">LOGO</div>
           </div>
           <div>
-            <h1 className="text-lg lg:text-xl font-bold text-white">CS Complaint System</h1>
-            <p className="text-xs text-slate-400">UniPort, Computer Science</p>
+            <h1 className="text-lg lg:text-xl font-bold text-white">CSCS</h1>
+            <p className="text-xs text-slate-400">Computer Science Complaints</p>
           </div>
         </div>
         <button
@@ -400,9 +287,9 @@ const ComplaintManagementSystem = () => {
           </button>
           <div>
             <h2 className="text-xl lg:text-2xl font-bold text-gray-900">
-              {activeTab === 'profile' ? 'My Profile' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+              {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
             </h2>
-            <p className="text-sm text-gray-600 hidden sm:block">University of Port Harcourt, Computer Science</p>
+            <p className="text-sm text-gray-600 hidden sm:block">Department of Computer Science - University of Port Harcourt</p>
           </div>
         </div>
         
@@ -427,253 +314,654 @@ const ComplaintManagementSystem = () => {
     </header>
   );
 
+  const StatCard = ({ title, value, icon: Icon, color, description, trend }) => (
+    <div className="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-4">
+        <div className={`p-2 lg:p-3 rounded-xl ${color}`}>
+          <Icon className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+        </div>
+        <div className="text-right">
+          <p className="text-2xl lg:text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-sm text-gray-600">{title}</p>
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-gray-500">{description}</p>
+        {trend && (
+          <div className={`flex items-center space-x-1 text-xs ${trend.includes('+') ? 'text-green-600' : 'text-red-600'}`}>
+            <TrendingUp className="h-3 w-3" />
+            <span>{trend}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const ComplaintCard = ({ complaint, onView, onViewDetails }) => (
+    <div className="bg-white rounded-xl lg:rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-4">
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded-md">#{complaint.id}</span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
+              {complaint.status}
+            </span>
+            <span className={`px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(complaint.priority)}`}>
+              {complaint.priority}
+            </span>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{complaint.title}</h3>
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2">{complaint.description}</p>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 lg:gap-4 text-xs text-gray-500">
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-4 w-4" />
+              <span>Submitted: {complaint.dateSubmitted}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4" />
+              <span>Updated: {complaint.lastUpdated}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <User className="h-4 w-4" />
+              <span className="truncate">Assigned: {complaint.assignedTo}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Building className="h-4 w-4" />
+              <span className="truncate">Category: {complaint.category}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2 mt-4 lg:mt-0 lg:ml-4">
+          <button
+            onClick={() => {
+              setSelectedComplaint(complaint);
+              setShowDetailsModal(true);
+            }}
+            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+            title="View Details"
+          >
+            <Eye className="h-4 w-4" />
+          </button>
+          <button className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Edit">
+            <Edit className="h-4 w-4" />
+          </button>
+          <button className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all" title="Message">
+            <MessageSquare className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+      
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-100 gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+            {complaint.category}
+          </span>
+          <span className="text-xs text-gray-500">{complaint.department}</span>
+        </div>
+        <button 
+          onClick={() => {
+            setSelectedComplaint(complaint);
+            setShowDetailsModal(true);
+          }}
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline transition-all"
+        >
+          View Details →
+        </button>
+      </div>
+    </div>
+  );
+
+  const ComplaintModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl lg:rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="p-6 lg:p-8 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl lg:text-2xl font-bold text-gray-900">Submit New Complaint</h3>
+              <p className="text-gray-600 mt-1">Provide detailed information for faster resolution</p>
+            </div>
+            <button
+              onClick={() => setShowComplaintModal(false)}
+              className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-6 lg:p-8 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Complaint Title *</label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all"
+                placeholder="Brief description of your complaint"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Department</label>
+              <input
+                type="text"
+                value={formData.department || currentUser.department}
+                onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-gray-50"
+                placeholder="Your department"
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Category *</label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all"
+              >
+                <option value="">Select category</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Priority *</label>
+              <select
+                value={formData.priority}
+                onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all"
+              >
+                <option value="">Select priority</option>
+                {priorities.map(priority => (
+                  <option key={priority} value={priority}>{priority}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">Location</label>
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all"
+                placeholder="Where did this issue occur?"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Description *</label>
+            <textarea
+              rows={6}
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent resize-none transition-all"
+              placeholder="Provide detailed information about your complaint, including dates, impact, and any relevant context..."
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">Attach Evidence (Optional)</label>
+            <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-slate-300 transition-colors">
+              <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Click to upload images, documents, or other evidence</p>
+              <p className="text-xs text-gray-500 mt-1">Max file size: 10MB</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
+            <button
+              onClick={() => setShowComplaintModal(false)}
+              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmitComplaint}
+              className="flex-1 px-6 py-3 bg-slate-600 text-white rounded-xl hover:bg-slate-700 font-semibold transition-all shadow-lg flex items-center justify-center space-x-2"
+            >
+              <Send className="h-5 w-5" />
+              <span>Submit Complaint</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="space-y-6 lg:space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-              {dashboardCards.map((card) => (
-                <StatCard key={card.title} {...card} />
-              ))}
-            </div>
-            <ComplaintList complaints={complaints} onSelectComplaint={() => {}} />
-          </div>
-        );
-      case 'complaints':
-        return (
-          <div className="space-y-6 lg:space-y-8">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl lg:text-2xl font-bold text-gray-900">My Complaints</h3>
-            </div>
-            <ComplaintList complaints={complaints} onSelectComplaint={() => {}} showFilter={true} />
-          </div>
-        );
-      case 'submit':
-        return <ComplaintForm />;
-      case 'analytics':
-        return (
-          <div className="space-y-6 lg:space-y-8">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl lg:text-2xl font-bold text-gray-900">Complaint Analytics</h3>
-                <p className="text-gray-600 mt-1">Insights and trends across all complaints in Computer Science</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6">
+              <div className="xl:col-span-2">
+                <StatCard
+                  title="Total Complaints"
+                  value={stats.total}
+                  icon={FileText}
+                  color="bg-slate-600"
+                  description="All time submissions"
+                  trend="+8% this month"
+                />
               </div>
-              <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-                  <select className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent">
-                    <option>Last 30 Days</option>
-                    <option>Last 90 Days</option>
-                    <option>This Year</option>
-                    <option>All Time</option>
-                  </select>
-                  <button className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
-                    <Download className="h-4 w-4" />
-                    <span className="text-sm font-medium">Export Report</span>
-                  </button>
+              <div className="xl:col-span-2">
+                <StatCard
+                  title="Open Cases"
+                  value={stats.open}
+                  icon={AlertCircle}
+                  color="bg-red-600"
+                  description="Awaiting assignment"
+                  trend="+5 this week"
+                />
+              </div>
+              <div className="xl:col-span-2">
+                <StatCard
+                  title="In Progress"
+                  value={stats.inProgress}
+                  icon={Clock}
+                  color="bg-amber-600"
+                  description="Being processed"
+                  trend="-12% resolved"
+                />
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
               <StatCard
-                title="Total Complaints"
-                value={stats.total}
-                icon={FileText}
-                color="bg-slate-600"
-                description="Overall submissions"
-                trend="+8% last month"
+                title="Resolved"
+                value={stats.resolved}
+                icon={CheckCircle}
+                color="bg-green-600"
+                description="Successfully closed"
+                trend="+18% efficiency"
               />
               <StatCard
-                title="Average Resolution Time"
+                title="Avg Resolution"
                 value={stats.avgResolutionTime}
-                icon={Clock}
+                icon={Activity}
                 color="bg-purple-600"
-                description="Avg. time to resolve"
-                trend="-2.1 days (improved)"
+                description="Average time to resolve"
+                trend="-2.1 days improved"
               />
               <StatCard
                 title="Satisfaction Rate"
                 value={stats.satisfactionRate}
                 icon={Star}
                 color="bg-blue-600"
-                description="Student feedback"
-                trend="+3% last quarter"
+                description="Student feedback rating"
+                trend="+3% this quarter"
               />
             </div>
-
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
-                <div className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100">
-                    <h4 className="text-lg lg:text-xl font-bold text-gray-900 mb-4">Complaints by Category</h4>
-                    <p className="text-gray-600 mb-6">Distribution of issues across different categories.</p>
-                    <div className="h-64 bg-gray-100 flex items-center justify-center rounded-xl text-gray-500 text-sm italic">
-                      [Category Distribution Chart Placeholder]
-                    </div>
+            
+            <div className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 lg:mb-8 gap-4">
+                <div>
+                  <h3 className="text-xl lg:text-2xl font-bold text-gray-900">Recent Activity</h3>
+                  <p className="text-gray-600 mt-1">Your latest complaint submissions and updates</p>
                 </div>
-
-                <div className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100">
-                    <h4 className="text-lg lg:text-xl font-bold text-gray-900 mb-4">Complaint Status Over Time</h4>
-                    <p className="text-gray-600 mb-6">Trend of open, in-progress, and resolved complaints.</p>
-                    <div className="h-64 bg-gray-100 flex items-center justify-center rounded-xl text-gray-500 text-sm italic">
-                      [Status Trend Line Chart Placeholder]
-                    </div>
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+                  <button className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
+                    <Filter className="h-4 w-4" />
+                    <span className="text-sm font-medium">Filter</span>
+                  </button>
+                  <button className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all">
+                    <Download className="h-4 w-4" />
+                    <span className="text-sm font-medium">Export</span>
+                  </button>
                 </div>
-
-                <div className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-8 shadow-sm border border-gray-100 xl:col-span-2">
-                    <h4 className="text-lg lg:text-xl font-bold text-gray-900 mb-4">Top 5 Most Frequent Complaints</h4>
-                    <p className="text-gray-600 mb-6">Recurring issues that require attention.</p>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Title
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Category
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Count
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Last Occurred
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Slow Wi-Fi in Lab</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">ICT</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-09-15</td>
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Projector Malfunction in Lecture Hall A</td>
-                                    <td className="px-6 py-4 whitespace-now-wrap text-sm text-gray-500">Facilities</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-09-10</td>
-                                </tr>
-                                <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Inadequate Textbooks in Library</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Academic</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">7</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-09-08</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+              </div>
+              
+              <div className="space-y-4 lg:space-y-6">
+                {complaints.slice(0, 3).map((complaint) => (
+                  <ComplaintCard 
+                    key={complaint.id} 
+                    complaint={complaint}
+                    onView={setSelectedComplaint}
+                    onViewDetails={() => {
+                      setSelectedComplaint(complaint);
+                      setShowDetailsModal(true);
+                    }}
+                  />
+                ))}
+              </div>
+              
+              <div className="text-center mt-6 lg:mt-8">
+                <button 
+                  onClick={() => setActiveTab('complaints')}
+                  className="px-6 lg:px-8 py-3 bg-slate-600 text-white rounded-xl hover:bg-slate-700 font-semibold transition-all shadow-lg"
+                >
+                  View All Complaints
+                </button>
+              </div>
             </div>
           </div>
         );
-      case 'profile':
+        
+      case 'complaints':
         return (
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100">
-              <div className="mb-8 lg:mb-10 text-center">
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  className="w-24 h-24 lg:w-32 lg:h-32 rounded-full mx-auto border-4 border-slate-200 object-cover"
+          <div className="space-y-6 lg:space-y-8">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-xl lg:text-2xl font-bold text-gray-900">My Complaints</h3>
+                <p className="text-gray-600 mt-1">Track and manage your submitted complaints</p>
+              </div>
+              <button
+                onClick={() => setShowComplaintModal(true)}
+                className="flex items-center justify-center space-x-2 px-6 py-3 bg-slate-600 text-white rounded-xl hover:bg-slate-700 font-semibold transition-all shadow-lg"
+              >
+                <Plus className="h-5 w-5" />
+                <span>New Complaint</span>
+              </button>
+            </div>
+            
+            <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="text"
+                    placeholder="Search your complaints..."
+                    className="pl-10 pr-4 py-3 w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <select className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent">
+                <option>All Statuses</option>
+                <option>Open</option>
+                <option>In Progress</option>
+                <option>Resolved</option>
+              </select>
+              <select className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent">
+                <option>All Categories</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="grid gap-4 lg:gap-6">
+              {complaints.map((complaint) => (
+                <ComplaintCard 
+                  key={complaint.id} 
+                  complaint={complaint}
+                  onView={setSelectedComplaint}
+                  onViewDetails={() => {
+                    setSelectedComplaint(complaint);
+                    setShowDetailsModal(true);
+                  }}
                 />
-                <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mt-4 mb-1">{currentUser.name}</h3>
-                <p className="text-lg text-gray-600 capitalize">{currentUser.role}</p>
-                <p className="text-md text-gray-500 mt-1">Matric No: {currentUser.matricNo}</p>
+              ))}
+            </div>
+          </div>
+        );
+        
+      case 'submit':
+        return (
+          <div className="max-w-5xl mx-auto">
+            <div className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-10 shadow-sm border border-gray-100">
+              <div className="mb-8 lg:mb-10">
+                <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">Submit New Complaint</h3>
+                <p className="text-gray-600 text-lg">Provide detailed information about your concern for faster resolution</p>
               </div>
               
               <div className="space-y-6 lg:space-y-8">
-                <div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                    <UserCircle className="h-6 w-6 text-slate-600" />
-                    <span>Personal Information</span>
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 bg-gray-50 p-6 rounded-xl">
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-600">Email Address</p>
-                        <p className="font-medium text-gray-900">{currentUser.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-5 w-5 text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-600">Phone Number</p>
-                        <p className="font-medium text-gray-900">{currentUser.phone}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3 md:col-span-2">
-                      <MapPin className="h-5 w-5 text-gray-500 mt-1" />
-                      <div>
-                        <p className="text-sm text-gray-600">Address</p>
-                        <p className="font-medium text-gray-900">{currentUser.address}</p>
-                      </div>
-                    </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Complaint Title *</label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-lg"
+                      placeholder="Brief description of your complaint"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Department</label>
+                    <input
+                      type="text"
+                      value={formData.department || currentUser.department}
+                      onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+                      className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all bg-gray-50 text-lg"
+                      placeholder="Your department"
+                    />
                   </div>
                 </div>
-
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Category *</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-lg"
+                    >
+                      <option value="">Select category</option>
+                      {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Priority *</label>
+                    <select
+                      value={formData.priority}
+                      onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                      className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-lg"
+                    >
+                      <option value="">Select priority</option>
+                      {priorities.map(priority => (
+                        <option key={priority} value={priority}>{priority}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">Location</label>
+                    <input
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition-all text-lg"
+                      placeholder="Where did this issue occur?"
+                    />
+                  </div>
+                </div>
+                
                 <div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                    <BookOpen className="h-6 w-6 text-slate-600" />
-                    <span>Academic Information</span>
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 bg-gray-50 p-6 rounded-xl">
-                    <div className="flex items-center space-x-3">
-                      <Building className="h-5 w-5 text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-600">Department</p>
-                        <p className="font-medium text-gray-900">{currentUser.department}</p>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Description *</label>
+                  <textarea
+                    rows={8}
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent resize-none transition-all text-lg"
+                    placeholder="Provide detailed information about your complaint, including dates, impact, and any relevant context..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">Attach Evidence (Optional)</label>
+                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-slate-300 transition-colors cursor-pointer">
+                    <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-lg text-gray-600 mb-2">Click to upload images, documents, or other evidence</p>
+                    <p className="text-sm text-gray-500">Max file size: 10MB • Supported formats: JPG, PNG, PDF, DOC</p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 pt-6 lg:pt-8">
+                  <button className="flex-1 px-8 py-4 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-all text-lg">
+                    Save Draft
+                  </button>
+                  <button
+                    onClick={handleSubmitComplaint}
+                    className="flex-1 px-8 py-4 bg-slate-600 text-white rounded-xl hover:bg-slate-700 font-semibold transition-all shadow-lg flex items-center justify-center space-x-3 text-lg"
+                  >
+                    <Send className="h-6 w-6" />
+                    <span>Submit Complaint</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        
+      default:
+        return (
+          <div className="text-center py-12 lg:py-20">
+            <div className="text-gray-400 mb-6">
+              <FileText className="h-16 w-16 lg:h-20 lg:w-20 mx-auto" />
+            </div>
+            <h3 className="text-lg lg:text-2xl font-bold text-gray-900 mb-4">Feature Coming Soon</h3>
+            <p className="text-gray-600 text-lg">This section is under development and will be available soon.</p>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 lg:p-6 xl:p-8">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
+      
+      {showComplaintModal && <ComplaintModal />}
+      {showDetailsModal && selectedComplaint && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl lg:rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="p-6 lg:p-8 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl lg:text-2xl font-bold text-gray-900">Complaint Details</h3>
+                  <p className="text-gray-600 mt-1">#{selectedComplaint.id}</p>
+                </div>
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 lg:p-8 space-y-6 lg:space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Complaint Information</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Title:</span>
+                        <span className="font-medium text-gray-900">{selectedComplaint.title}</span>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Briefcase className="h-5 w-5 text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-600">Faculty</p>
-                        <p className="font-medium text-gray-900">{currentUser.faculty}</p>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Status:</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedComplaint.status)}`}>
+                          {selectedComplaint.status}
+                        </span>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Award className="h-5 w-5 text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-600">Level</p>
-                        <p className="font-medium text-gray-900">{currentUser.level}</p>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Priority:</span>
+                        <span className={`px-2 py-1 rounded-md text-xs font-medium ${getPriorityColor(selectedComplaint.priority)}`}>
+                          {selectedComplaint.priority}
+                        </span>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Hash className="h-5 w-5 text-gray-500" />
-                      <div>
-                        <p className="text-sm text-gray-600">Matriculation Number</p>
-                        <p className="font-medium text-gray-900">{currentUser.matricNo}</p>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Category:</span>
+                        <span className="font-medium text-gray-900">{selectedComplaint.category}</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
-                  <button className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-all">
-                    Change Password
-                  </button>
-                  <button className="flex-1 px-6 py-3 bg-slate-600 text-white rounded-xl hover:bg-slate-700 font-semibold transition-all shadow-lg flex items-center justify-center space-x-2">
-                    <Edit className="h-5 w-5" />
-                    <span>Edit Profile</span>
-                  </button>
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Timeline</h4>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Submitted:</span>
+                        <span className="font-medium text-gray-900">{selectedComplaint.dateSubmitted}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Last Updated:</span>
+                        <span className="font-medium text-gray-900">{selectedComplaint.lastUpdated}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+              
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Description</h4>
+                <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-xl">{selectedComplaint.description}</p>
+              </div>
+              
+              {selectedComplaint.resolution && (
+                <div>
+                  <h4 className="text-lg font-semibold text-green-700 mb-4">Resolution</h4>
+                  <p className="text-gray-700 leading-relaxed bg-green-50 p-4 rounded-xl border border-green-200">{selectedComplaint.resolution}</p>
+                </div>
+              )}
+              
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Updates & Activity</h4>
+                <div className="space-y-4">
+                  {selectedComplaint.updates.map((update, index) => (
+                    <div key={index} className="flex items-start space-x-4 p-4 bg-gray-50 rounded-xl">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                      <div className="flex-1">
+                        <p className="text-gray-700">{update.message}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-xs text-gray-500">by {update.by}</span>
+                          <span className="text-xs text-gray-500">{update.date}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 font-semibold transition-all"
+                >
+                  Close
+                </button>
+                <button className="flex-1 px-6 py-3 bg-slate-600 text-white rounded-xl hover:bg-slate-700 font-semibold transition-all shadow-lg flex items-center justify-center space-x-2">
+                  <MessageSquare className="h-5 w-5" />
+                  <span>Add Comment</span>
+                </button>
               </div>
             </div>
           </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-100 flex font-sans text-slate-900">
-      <Sidebar />
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'lg:ml-72' : 'lg:ml-0'}`}>
-        <Header />
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
-          {renderContent()}
-        </main>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
